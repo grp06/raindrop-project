@@ -1,10 +1,9 @@
 import { useState } from "react"
-import { ChevronDown, ChevronRight, ChevronUp, Info, Loader2, Sparkles } from "lucide-react"
+import { ChevronDown, ChevronRight, ChevronUp, Loader2, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { fieldGroups } from "@/constants/fields"
 import { moreExamples, primaryExamples } from "@/constants/examples"
 
 type QueryCardProps = {
@@ -25,7 +24,6 @@ function QueryCard({
   error,
 }: QueryCardProps) {
   const [showMoreExamples, setShowMoreExamples] = useState(false)
-  const [showFields, setShowFields] = useState(false)
 
   return (
     <Card className="shadow-sm">
@@ -83,43 +81,23 @@ function QueryCard({
                     </button>
                   ))}
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                <button
-                  type="button"
-                  onClick={() => setShowMoreExamples(!showMoreExamples)}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-                >
-                  {showMoreExamples ? (
-                    <>
-                      <ChevronUp className="h-3 w-3" />
-                      Show fewer examples
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-3 w-3" />
-                      Show more examples
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowFields(!showFields)}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-                >
-                  <Info className="h-3 w-3" />
-                  {showFields ? "Hide" : "View"} available fields
-                </button>
-              </div>
-              {showFields && (
-                <div className="rounded-lg border bg-muted/50 p-3 text-xs space-y-1.5">
-                  {fieldGroups.map((group) => (
-                    <div key={group.label} className="flex gap-2">
-                      <span className="font-medium text-foreground w-24 shrink-0">{group.label}:</span>
-                      <span className="text-muted-foreground">{group.fields}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => setShowMoreExamples(!showMoreExamples)}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+              >
+                {showMoreExamples ? (
+                  <>
+                    <ChevronUp className="h-3 w-3" />
+                    Show fewer examples
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3 w-3" />
+                    Show more examples
+                  </>
+                )}
+              </button>
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">

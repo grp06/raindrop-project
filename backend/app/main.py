@@ -16,16 +16,19 @@ class QueryRequest(BaseModel):
 
 app = FastAPI()
 
-allowed_origins = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:5173,https://raindrop-project.vercel.app"
-).split(",")
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:5173,https://raindrop-project.vercel.app"
+    ).split(",")
+]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
 logger = logging.getLogger(__name__)
