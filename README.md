@@ -1,4 +1,4 @@
-# CFG-to-SQL (ClickHouse) Toy
+# CFG-to-SQL (ClickHouse)
 
 Small demo app that turns a natural-language question into **ClickHouse SQL** using **GPT-5 + a context-free grammar (CFG)**, validates the SQL server-side, executes it against ClickHouse, and shows the SQL + results in a simple React UI.
 
