@@ -2,8 +2,27 @@ from functools import lru_cache
 
 from lark import Lark, UnexpectedInput
 
+from .schema import COLUMNS, DATABASE, NUMERIC_COLUMNS, TABLE
 
-_SQL_GRAMMAR = r"""
+
+def _token(name: str) -> str:
+    return name.upper()
+
+
+def _rule(name: str, tokens: tuple[str, ...]) -> str:
+    lines = [f"{name}: {tokens[0]}"]
+    for token in tokens[1:]:
+        lines.append(f"      | {token}")
+    return "\n".join(lines)
+
+
+COLUMN_TOKENS = tuple(_token(column) for column in COLUMNS)
+NUMERIC_TOKENS = tuple(_token(column) for column in NUMERIC_COLUMNS)
+COLUMN_RULE = _rule("column", COLUMN_TOKENS)
+NUMERIC_RULE = _rule("numeric_column", NUMERIC_TOKENS)
+TOKEN_DEFS = "\n".join(f'{token}: "{column}"' for token, column in zip(COLUMN_TOKENS, COLUMNS))
+
+_SQL_GRAMMAR = f"""
 start: select_stmt
 
 select_stmt: SELECT select_list FROM table_name where_clause? group_by_clause? order_by_clause? limit_clause?
@@ -61,29 +80,9 @@ agg_func: SUM
 
 table_name: DEFAULT_DB "." BODY_PERFORMANCE_TABLE
 
-column: AGE
-      | GENDER
-      | HEIGHT_CM
-      | WEIGHT_KG
-      | BODY_FAT_PCT
-      | DIASTOLIC
-      | SYSTOLIC
-      | GRIP_FORCE
-      | SIT_AND_BEND_FORWARD_CM
-      | SITUPS_COUNT
-      | BROAD_JUMP_CM
-      | FITNESS_CLASS
+{COLUMN_RULE}
 
-numeric_column: AGE
-              | HEIGHT_CM
-              | WEIGHT_KG
-              | BODY_FAT_PCT
-              | DIASTOLIC
-              | SYSTOLIC
-              | GRIP_FORCE
-              | SIT_AND_BEND_FORWARD_CM
-              | SITUPS_COUNT
-              | BROAD_JUMP_CM
+{NUMERIC_RULE}
 
 literal: string_literal
        | number_literal
@@ -112,20 +111,9 @@ AVG: "AVG"
 MIN: "MIN"
 MAX: "MAX"
 AND: "AND"
-DEFAULT_DB: "default"
-BODY_PERFORMANCE_TABLE: "bodyPerformance"
-AGE: "age"
-GENDER: "gender"
-HEIGHT_CM: "height_cm"
-WEIGHT_KG: "weight_kg"
-BODY_FAT_PCT: "body_fat_pct"
-DIASTOLIC: "diastolic"
-SYSTOLIC: "systolic"
-GRIP_FORCE: "grip_force"
-SIT_AND_BEND_FORWARD_CM: "sit_and_bend_forward_cm"
-SITUPS_COUNT: "situps_count"
-BROAD_JUMP_CM: "broad_jump_cm"
-FITNESS_CLASS: "fitness_class"
+DEFAULT_DB: "{DATABASE}"
+BODY_PERFORMANCE_TABLE: "{TABLE}"
+{TOKEN_DEFS}
 
 %import common.INT
 %import common.SIGNED_NUMBER

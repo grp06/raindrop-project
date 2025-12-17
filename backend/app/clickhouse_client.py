@@ -8,6 +8,7 @@ import clickhouse_connect
 from clickhouse_connect.driver.client import Client
 from dotenv import load_dotenv
 
+from .schema import COLUMNS, DATABASE, TABLE
 from .sql_grammar import validate_sql
 
 logger = logging.getLogger(__name__)
@@ -16,13 +17,12 @@ ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 
 HOST = "zdni402lap.us-east1.gcp.clickhouse.cloud"
 USER = "default"
-DATABASE = "default"
-TABLE = "bodyPerformance"
 PORT = 8443
 SECURE = True
 PASSWORD_ENV = "CLICKHOUSE_PASSWORD"
 MAX_EXECUTION_TIME_SECONDS = 20
 MAX_RESULT_ROWS = 1000
+SELECT_COLUMNS = ", ".join(COLUMNS)
 
 
 def _require_password() -> str:
@@ -69,13 +69,7 @@ def query_body_performance_sample(limit: int = 25) -> Dict[str, Any]:
     if limit <= 0:
         raise ValueError("limit must be positive")
     client = get_client()
-    sql = (
-        "SELECT age, gender, height_cm, weight_kg, body_fat_pct, "
-        "diastolic, systolic, grip_force, sit_and_bend_forward_cm, "
-        "situps_count, broad_jump_cm, fitness_class "
-        f"FROM {DATABASE}.{TABLE} "
-        f"LIMIT {limit}"
-    )
+    sql = f"SELECT {SELECT_COLUMNS} FROM {DATABASE}.{TABLE} LIMIT {limit}"
     result = client.query(sql)
     columns: List[str] = result.column_names
     rows = [dict(zip(columns, row)) for row in result.result_rows]

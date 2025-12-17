@@ -21,15 +21,15 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const examplePrompts = [
-    'What were global BEV car sales in 2023?',
-    'Compare EV stock between China and the US over the last 5 years.',
-    'How many public fast chargers are there in Europe?',
-    'What will global EV sales be in 2030 under the STEPS scenario?',
-    'Which country had the highest EV market share in 2023?',
-    'Show EV stock growth in Europe from 2020 to 2023.',
-    'How much electricity will EVs demand in China by 2035?',
-    'Compare PHEV vs BEV sales growth from 2021 to 2023.',
-    'Which regions have EV market share above 10% in 2023?',
+    'Average grip force by fitness class',
+    'Compare average body fat percentage between genders.',
+    'How many participants are in each fitness class?',
+    'Average sit-ups count by age and gender.',
+    'Top 5 broad jump results for females.',
+    'Average systolic and diastolic blood pressure by fitness class.',
+    'Compare average weight between fitness class A and D.',
+    'Average grip force for age 40 and above by gender.',
+    'How many participants are 20 to 29 years old?',
   ]
 
   const fetchHealth = async () => {
@@ -106,13 +106,13 @@ function App() {
         <header className="flex flex-col gap-6 rounded-2xl border bg-card/80 p-6 shadow-sm backdrop-blur md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
             <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-tight">
-              IEA Global EV Data explorer
+              Body performance explorer
             </Badge>
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-              Ask questions about EV adoption and projections
+              Ask questions about physical performance
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground">
-              Turn natural-language questions into SQL to explore EV sales, stock, charging, and scenario projections.
+              Turn natural-language questions into SQL to explore fitness, strength, and health metrics.
             </p>
           </div>
           <Button variant="outline" size="lg" onClick={fetchHealth} disabled={loading}>
@@ -133,20 +133,20 @@ function App() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card className="shadow-sm">
             <CardHeader className="space-y-2">
-              <CardTitle>Ask about the EV dataset</CardTitle>
+              <CardTitle>Ask about the body performance dataset</CardTitle>
               <CardDescription>Describe what you want to know; we will generate SQL for you.</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-4" onSubmit={submitPrompt}>
                 <div className="space-y-2">
                   <Label htmlFor="prompt">Prompt</Label>
-                  <Textarea
-                    id="prompt"
-                    value={prompt}
-                    onChange={(event) => setPrompt(event.target.value)}
-                    placeholder="What were global BEV car sales in 2023? or Compare EV stock between China and the US over the last 5 years."
-                    rows={5}
-                  />
+                    <Textarea
+                      id="prompt"
+                      value={prompt}
+                      onChange={(event) => setPrompt(event.target.value)}
+                    placeholder="Average grip force by fitness class, or compare average body fat percentage between genders."
+                      rows={5}
+                    />
                   <div className="flex flex-wrap gap-2">
                     {examplePrompts.map((example) => (
                       <Button

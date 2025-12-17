@@ -6,6 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from .schema import COLUMNS, DATASET
 from .sql_grammar import sql_grammar, validate_sql
 
 logger = logging.getLogger(__name__)
@@ -15,10 +16,10 @@ API_KEY_ENV = "OPENAI_API_KEY"
 MODEL_ENV = "OPENAI_MODEL"
 DEFAULT_MODEL = "gpt-5.2"
 TOOL_NAME = "sql_query"
+COLUMN_LIST = ", ".join(COLUMNS)
 SYSTEM_INSTRUCTIONS = (
-    "You generate ClickHouse SQL for the dataset default.bodyPerformance "
-    "with columns age, gender, height_cm, weight_kg, body_fat_pct, diastolic, "
-    "systolic, grip_force, sit_and_bend_forward_cm, situps_count, broad_jump_cm, fitness_class. "
+    f"You generate ClickHouse SQL for the dataset {DATASET} "
+    f"with columns {COLUMN_LIST}. "
     "Use a single SELECT statement that matches the provided grammar and answer the user's request. "
     "gender is 'F' or 'M'. fitness_class is one of A, B, C, D (A is best, D is worst). "
     "Numeric columns can be aggregated with SUM, AVG, MIN, MAX; use COUNT(column) for counts. "
