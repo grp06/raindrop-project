@@ -17,7 +17,7 @@ ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 HOST = "zdni402lap.us-east1.gcp.clickhouse.cloud"
 USER = "default"
 DATABASE = "default"
-TABLE = "IEA_Global_EV_Data_2024"
+TABLE = "bodyPerformance"
 PORT = 8443
 SECURE = True
 PASSWORD_ENV = "CLICKHOUSE_PASSWORD"
@@ -65,14 +65,15 @@ def clickhouse_ping() -> Dict[str, Any]:
     }
 
 
-def query_iea_sample(year: int = 2023, limit: int = 25) -> Dict[str, Any]:
+def query_body_performance_sample(limit: int = 25) -> Dict[str, Any]:
     if limit <= 0:
         raise ValueError("limit must be positive")
     client = get_client()
     sql = (
-        "SELECT region, year, parameter, mode, powertrain, unit, value "
+        "SELECT age, gender, height_cm, weight_kg, body_fat_pct, "
+        "diastolic, systolic, grip_force, sit_and_bend_forward_cm, "
+        "situps_count, broad_jump_cm, fitness_class "
         f"FROM {DATABASE}.{TABLE} "
-        f"WHERE year = {year} "
         f"LIMIT {limit}"
     )
     result = client.query(sql)

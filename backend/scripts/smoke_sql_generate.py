@@ -7,7 +7,7 @@ sys.path.insert(0, str(ROOT))
 from app.sql_generation import generate_sql
 
 
-PROMPT = "What were the total EV sales in the USA in 2023?"
+PROMPT = "Compare average grip_force between genders."
 
 
 def main() -> None:

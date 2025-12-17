@@ -10,7 +10,17 @@ select_stmt: SELECT select_list FROM table_name where_clause? group_by_clause? o
 
 select_list: select_item ("," select_item)*
 
-agg_expr: agg_func "(" value_column ")" alias?
+agg_expr: sum_expr
+        | avg_expr
+        | min_expr
+        | max_expr
+        | count_expr
+
+sum_expr: SUM "(" numeric_column ")" alias?
+avg_expr: AVG "(" numeric_column ")" alias?
+min_expr: MIN "(" numeric_column ")" alias?
+max_expr: MAX "(" numeric_column ")" alias?
+count_expr: COUNT "(" column ")" alias?
 alias: AS IDENTIFIER
 
 select_item: agg_expr
@@ -40,6 +50,7 @@ group_by_clause: GROUP BY column_list
 order_by_clause: ORDER BY order_list
 order_list: order_item ("," order_item)*
 order_item: column order_dir?
+          | IDENTIFIER order_dir?
 order_dir: ASC | DESC
 
 agg_func: SUM
@@ -48,24 +59,37 @@ agg_func: SUM
         | MIN
         | MAX
 
-table_name: DEFAULT_DB "." IEA_TABLE
+table_name: DEFAULT_DB "." BODY_PERFORMANCE_TABLE
 
-value_column: VALUE
+column: AGE
+      | GENDER
+      | HEIGHT_CM
+      | WEIGHT_KG
+      | BODY_FAT_PCT
+      | DIASTOLIC
+      | SYSTOLIC
+      | GRIP_FORCE
+      | SIT_AND_BEND_FORWARD_CM
+      | SITUPS_COUNT
+      | BROAD_JUMP_CM
+      | FITNESS_CLASS
 
-column: REGION
-      | CATEGORY
-      | PARAMETER
-      | MODE
-      | POWERTRAIN
-      | YEAR
-      | UNIT
-      | VALUE
+numeric_column: AGE
+              | HEIGHT_CM
+              | WEIGHT_KG
+              | BODY_FAT_PCT
+              | DIASTOLIC
+              | SYSTOLIC
+              | GRIP_FORCE
+              | SIT_AND_BEND_FORWARD_CM
+              | SITUPS_COUNT
+              | BROAD_JUMP_CM
 
 literal: string_literal
        | number_literal
 
 string_literal: SINGLE_QUOTED
-number_literal: INT
+number_literal: SIGNED_NUMBER
 
 IDENTIFIER: /[A-Za-z_][A-Za-z0-9_]*/
 
@@ -89,17 +113,22 @@ MIN: "MIN"
 MAX: "MAX"
 AND: "AND"
 DEFAULT_DB: "default"
-IEA_TABLE: "IEA_Global_EV_Data_2024"
-REGION: "region"
-CATEGORY: "category"
-PARAMETER: "parameter"
-MODE: "mode"
-POWERTRAIN: "powertrain"
-YEAR: "year"
-UNIT: "unit"
-VALUE: "value"
+BODY_PERFORMANCE_TABLE: "bodyPerformance"
+AGE: "age"
+GENDER: "gender"
+HEIGHT_CM: "height_cm"
+WEIGHT_KG: "weight_kg"
+BODY_FAT_PCT: "body_fat_pct"
+DIASTOLIC: "diastolic"
+SYSTOLIC: "systolic"
+GRIP_FORCE: "grip_force"
+SIT_AND_BEND_FORWARD_CM: "sit_and_bend_forward_cm"
+SITUPS_COUNT: "situps_count"
+BROAD_JUMP_CM: "broad_jump_cm"
+FITNESS_CLASS: "fitness_class"
 
 %import common.INT
+%import common.SIGNED_NUMBER
 %import common.WS_INLINE
 %ignore WS_INLINE
 """

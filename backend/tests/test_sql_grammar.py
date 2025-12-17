@@ -4,32 +4,31 @@ from app.sql_grammar import validate_sql
 
 
 class TestSqlGrammar(unittest.TestCase):
-    def test_accepts_milestone_query(self):
+    def test_accepts_simple_filter(self):
         sql = (
-            "SELECT SUM(value) FROM default.IEA_Global_EV_Data_2024 "
-            "WHERE region = 'USA' AND parameter = 'EV sales' AND year = 2023"
+            "SELECT AVG(grip_force) FROM default.bodyPerformance "
+            "WHERE gender = 'F'"
         )
         validate_sql(sql)
 
     def test_accepts_group_by_in_and_range(self):
         sql = (
-            "SELECT region, year, SUM(value) AS ev_stock "
-            "FROM default.IEA_Global_EV_Data_2024 "
-            "WHERE parameter = 'EV stock' AND category = 'Historical' AND mode = 'Cars' "
-            "AND region IN ('China', 'USA') AND year >= 2019 AND year <= 2023 "
-            "GROUP BY region, year "
-            "ORDER BY year, region"
+            "SELECT fitness_class, AVG(situps_count) AS avg_situps "
+            "FROM default.bodyPerformance "
+            "WHERE age >= 30 AND age <= 40 AND gender IN ('F', 'M') "
+            "GROUP BY fitness_class "
+            "ORDER BY avg_situps DESC LIMIT 5"
         )
         validate_sql(sql)
 
     def test_rejects_drop_table(self):
         with self.assertRaises(ValueError):
-            validate_sql("DROP TABLE default.IEA_Global_EV_Data_2024")
+            validate_sql("DROP TABLE default.bodyPerformance")
 
     def test_rejects_select_star(self):
         with self.assertRaises(ValueError):
-            validate_sql("SELECT * FROM default.IEA_Global_EV_Data_2024 WHERE year = 2023")
+            validate_sql("SELECT * FROM default.bodyPerformance WHERE age = 30")
 
     def test_rejects_other_table(self):
         with self.assertRaises(ValueError):
-            validate_sql("SELECT SUM(value) FROM other.table WHERE year = 2023")
+            validate_sql("SELECT AVG(weight_kg) FROM other.table WHERE age = 30")

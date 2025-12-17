@@ -16,19 +16,15 @@ MODEL_ENV = "OPENAI_MODEL"
 DEFAULT_MODEL = "gpt-5.2"
 TOOL_NAME = "sql_query"
 SYSTEM_INSTRUCTIONS = (
-    "You generate ClickHouse SQL for the dataset default.IEA_Global_EV_Data_2024 "
-    "with columns region, category, parameter, mode, powertrain, year, unit, value. "
+    "You generate ClickHouse SQL for the dataset default.bodyPerformance "
+    "with columns age, gender, height_cm, weight_kg, body_fat_pct, diastolic, "
+    "systolic, grip_force, sit_and_bend_forward_cm, situps_count, broad_jump_cm, fitness_class. "
     "Use a single SELECT statement that matches the provided grammar and answer the user's request. "
-    "Vehicle type must be filtered with mode (Cars, Buses, Vans, Trucks). "
-    "Category is the time horizon and can be Historical, Projection-STEPS, or Projection-APS; do not place vehicle types in category. "
-    "When the user asks about past years, prefer category='Historical'. "
-    "Powertrain is the propulsion type (BEV, PHEV, FCEV). "
-    "When comparing multiple regions, include all of them using region IN ('China', 'USA', ...). "
-    "When the user asks for a time range or the last N years, filter with year >= <start> AND year <= <end>. "
-    "The latest year in category='Historical' is 2023, so 'last 5 years' means years 2019 through 2023. "
-    "When returning time series comparisons, select region and year and aggregate with SUM(value), then GROUP BY region, year and ORDER BY year, region. "
-    "For parameter='EV stock', if the user does not specify a powertrain, sum across powertrain values by not filtering powertrain. "
-    "Use region='USA' for the United States (not 'US' or 'United States'). "
+    "gender is 'F' or 'M'. fitness_class is one of A, B, C, D (A is best, D is worst). "
+    "Numeric columns can be aggregated with SUM, AVG, MIN, MAX; use COUNT(column) for counts. "
+    "For comparisons, use GROUP BY on the grouping columns and ORDER BY to make results readable. "
+    "For top-N requests, ORDER BY the metric and include LIMIT N. "
+    "Use exact column names as shown. "
     "Return only the needed aggregates or columns."
 )
 
@@ -62,7 +58,7 @@ def _custom_tool() -> dict:
     return {
         "type": "custom",
         "name": TOOL_NAME,
-        "description": "Generate a single ClickHouse SELECT statement for the IEA EV dataset.",
+        "description": "Generate a single ClickHouse SELECT statement for the body performance dataset.",
         "format": {
             "type": "grammar",
             "syntax": "lark",
