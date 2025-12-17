@@ -1,6 +1,8 @@
 import logging
+import os
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -13,6 +15,19 @@ class QueryRequest(BaseModel):
 
 
 app = FastAPI()
+
+allowed_origins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:5173,https://raindrop-project.vercel.app"
+).split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 logger = logging.getLogger(__name__)
 
 
