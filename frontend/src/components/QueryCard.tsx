@@ -27,7 +27,7 @@ function QueryCard({
 
   return (
     <Card className="shadow-sm">
-      <CardHeader className="space-y-2">
+      <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Search className="h-5 w-5 text-primary" />
           Your question
@@ -36,13 +36,13 @@ function QueryCard({
       </CardHeader>
       <CardContent>
         <form
-          className="space-y-4"
+          className="space-y-6"
           onSubmit={(event) => {
             event.preventDefault()
             onSubmit()
           }}
         >
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Label htmlFor="prompt" className="sr-only">
               Prompt
             </Label>
@@ -54,14 +54,14 @@ function QueryCard({
               rows={4}
               className="text-base"
             />
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground font-medium">Try an example:</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground font-medium">Try an example:</p>
+              <div className="flex flex-wrap gap-2.5">
                 {primaryExamples.map((example) => (
                   <button
                     key={example}
                     type="button"
-                    className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left disabled:opacity-50"
+                    className="text-sm px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left disabled:opacity-50"
                     onClick={() => onExampleSelect(example)}
                     disabled={loading}
                   >
@@ -73,7 +73,7 @@ function QueryCard({
                     <button
                       key={example}
                       type="button"
-                      className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left disabled:opacity-50"
+                      className="text-sm px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left disabled:opacity-50"
                       onClick={() => onExampleSelect(example)}
                       disabled={loading}
                     >
@@ -84,7 +84,7 @@ function QueryCard({
               <button
                 type="button"
                 onClick={() => setShowMoreExamples(!showMoreExamples)}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
               >
                 {showMoreExamples ? (
                   <>
@@ -100,7 +100,7 @@ function QueryCard({
               </button>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-col gap-1 text-sm">{error && <span className="text-destructive">{error}</span>}</div>
             <Button type="submit" disabled={loading || !prompt.trim()} size="lg" className="gap-2">
               {loading ? (

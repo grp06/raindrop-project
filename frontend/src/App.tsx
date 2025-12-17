@@ -55,27 +55,27 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-muted/40 via-background to-background">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10">
-        <header className="rounded-2xl border bg-card/80 p-6 shadow-sm backdrop-blur">
-          <div className="space-y-3">
+        <header className="rounded-2xl border bg-card/80 p-8 shadow-sm backdrop-blur">
+          <div className="space-y-4">
             <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-tight bg-primary/10 text-primary">
               Fitness Data Explorer
             </Badge>
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-4xl font-semibold tracking-tight text-foreground">
               Ask anything about 13,000+ athletes
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Ask questions in plain English. We'll query a real dataset of physical performance metrics and show you the results.
+            <p className="text-lg text-muted-foreground">
+              Ask questions in plain English. We'll translate your question into SQL, run it against a real dataset of physical performance metrics, and show you the results.
             </p>
             <button
               type="button"
               onClick={() => setSchemaOpen(!schemaOpen)}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {schemaOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
               <span className="font-mono">schema</span>
             </button>
             {schemaOpen && (
-              <div className="rounded-lg border bg-muted/40 p-4 font-mono text-xs grid gap-2 sm:grid-cols-2">
+              <div className="rounded-lg border bg-muted/40 p-4 font-mono text-sm grid gap-4 sm:grid-cols-2">
                 {fieldGroups.map((group) => (
                   <div key={group.label} className="flex flex-col gap-0.5">
                     <span className="text-muted-foreground uppercase tracking-wide text-[10px]">{group.label}</span>

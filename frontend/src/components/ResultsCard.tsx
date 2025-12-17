@@ -25,7 +25,7 @@ function ResultsCard({ result, loading }: ResultsCardProps) {
 
   return (
     <Card className="shadow-sm">
-      <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
@@ -35,7 +35,7 @@ function ResultsCard({ result, loading }: ResultsCardProps) {
         </div>
         {hasError && <Badge variant="destructive">Error</Badge>}
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         {!result && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             {loading ? (
@@ -43,7 +43,7 @@ function ResultsCard({ result, loading }: ResultsCardProps) {
                 <div className="mb-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 p-4">
                   <Loader2 className="h-8 w-8 text-primary animate-spin" />
                 </div>
-                <p className="text-sm text-muted-foreground">Analyzing your question...</p>
+                <p className="text-base text-muted-foreground">Analyzing your question...</p>
               </>
             ) : (
               <>
@@ -55,36 +55,36 @@ function ResultsCard({ result, loading }: ResultsCardProps) {
                     <Sparkles className="h-3 w-3 text-primary" />
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">Your results will appear here</p>
+                <p className="text-base text-muted-foreground">Your results will appear here</p>
               </>
             )}
           </div>
         )}
 
         {result && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {(hasRows || (!hasError && !hasRows)) && (
-              <div className="max-h-72 overflow-auto rounded-lg border bg-muted/40 px-3 py-2">
+              <div className="max-h-72 overflow-auto rounded-lg border bg-muted/40 p-4">
                 {hasRows ? (
                   <ResultsTable columns={result.columns} rows={rows} />
                 ) : (
-                  <p className="text-sm text-muted-foreground py-4 text-center">No matching results found.</p>
+                  <p className="text-base text-muted-foreground py-4 text-center">No matching results found.</p>
                 )}
               </div>
             )}
 
             {result.sql && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <button
                   type="button"
                   onClick={() => setShowSql(!showSql)}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
                 >
-                  <Code2 className="h-3 w-3" />
+                  <Code2 className="h-4 w-4" />
                   {showSql ? "Hide" : "Show"} generated SQL
                 </button>
                 {showSql && (
-                  <ScrollArea className="h-24 rounded-lg border bg-muted/40 px-3 py-2">
+                  <ScrollArea className="h-24 rounded-lg border bg-muted/40 p-4">
                     <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-muted-foreground">
                       {result.sql}
                     </pre>
@@ -94,9 +94,9 @@ function ResultsCard({ result, loading }: ResultsCardProps) {
             )}
 
             {hasError && (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-destructive">Error</p>
-                <ScrollArea className="rounded-lg border bg-destructive/10 px-3 py-2 text-destructive">
+              <div className="space-y-3">
+                <p className="text-sm font-semibold uppercase tracking-wide text-destructive">Error</p>
+                <ScrollArea className="rounded-lg border bg-destructive/10 p-4 text-destructive">
                   <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">{result.error}</pre>
                 </ScrollArea>
               </div>

@@ -11,11 +11,11 @@ function ResultsTable({ columns, rows }: ResultsTableProps) {
   }
 
   return (
-    <table className="w-full text-sm">
-      <thead className="sticky -top-2 -mx-3 px-3 bg-muted">
+    <table className="w-full text-base">
+      <thead className="sticky -top-4 bg-muted">
         <tr className="text-left text-muted-foreground">
           {columns.map((column) => (
-            <th key={column} className="border-b py-2 pr-4 font-medium">
+            <th key={column} className="border-b py-3 pr-6 font-medium">
               {column}
             </th>
           ))}
@@ -25,7 +25,7 @@ function ResultsTable({ columns, rows }: ResultsTableProps) {
         {rows.map((row, index) => (
           <tr key={index} className="border-b last:border-0">
             {columns.map((column) => (
-              <td key={column} className="py-2 pr-4">
+              <td key={column} className="py-3 pr-6">
                 {String(row[column] ?? "")}
               </td>
             ))}
