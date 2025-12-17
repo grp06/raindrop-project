@@ -9,6 +9,7 @@ import { Database, Loader2, Send, Server } from 'lucide-react'
 
 type QueryResponse = {
   sql: string
+  columns?: string[]
   rows: unknown[]
   error?: string
 }
@@ -70,12 +71,27 @@ function App() {
         body: JSON.stringify({ prompt: trimmed }),
       })
 
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`)
+      let data: QueryResponse | null = null
+      try {
+        data = (await response.json()) as QueryResponse
+      } catch (_err) {
+        data = null
       }
 
-      const data = (await response.json()) as QueryResponse
+      if (!response.ok) {
+        const message = data?.error ?? `Request failed with status ${response.status}`
+        setResult(data ?? { sql: '', columns: [], rows: [], error: message })
+        setError(message)
+        return
+      }
+
+      if (!data) {
+        setError('Backend returned an empty response.')
+        return
+      }
+
       setResult(data)
+      setError(data.error ?? null)
     } catch (err) {
       console.error(err)
       setError('Request failed. Check backend logs for details.')
@@ -196,10 +212,51 @@ function App() {
                   </div>
                   <div className="space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Rows</p>
-                    <ScrollArea className="h-40 rounded-lg border bg-muted/40 px-3 py-2">
-                      <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                        {Array.isArray(result.rows) ? JSON.stringify(result.rows, null, 2) : '—'}
-                      </pre>
+                    <ScrollArea className="h-60 rounded-lg border bg-muted/40 px-3 py-2">
+                      {Array.isArray(result.rows) && result.rows.length > 0 && result.rows.every((row) => row && typeof row === 'object' && !Array.isArray(row)) ? (
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-left text-muted-foreground">
+                              {(result.columns && result.columns.length > 0
+                                ? result.columns
+                                : Array.from(
+                                    new Set(
+                                      (result.rows as Record<string, unknown>[]).flatMap((row) => Object.keys(row)),
+                                    ),
+                                  )
+                              ).map((column) => (
+                                <th key={column} className="border-b py-2 pr-4 font-medium">
+                                  {column}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(result.rows as Record<string, unknown>[]).map((row, index) => {
+                              const columns =
+                                result.columns && result.columns.length > 0
+                                  ? result.columns
+                                  : Object.keys(row)
+                              return (
+                                <tr key={index} className="border-b last:border-0">
+                                  {columns.map((column) => (
+                                    <td key={column} className="py-2 pr-4">
+                                      {String(row[column] ?? '')}
+                                    </td>
+                                  ))}
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
+                          {Array.isArray(result.rows) ? JSON.stringify(result.rows, null, 2) : '—'}
+                        </pre>
+                      )}
+                      {Array.isArray(result.rows) && result.rows.length === 0 && (
+                        <p className="text-sm text-muted-foreground">No rows returned.</p>
+                      )}
                     </ScrollArea>
                   </div>
                   {result.error && (

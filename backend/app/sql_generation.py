@@ -18,7 +18,18 @@ TOOL_NAME = "sql_query"
 SYSTEM_INSTRUCTIONS = (
     "You generate ClickHouse SQL for the dataset default.IEA_Global_EV_Data_2024 "
     "with columns region, category, parameter, mode, powertrain, year, unit, value. "
-    "Use a single SELECT statement that matches the provided grammar and answer the user's request."
+    "Use a single SELECT statement that matches the provided grammar and answer the user's request. "
+    "Vehicle type must be filtered with mode (Cars, Buses, Vans, Trucks). "
+    "Category is the time horizon and can be Historical, Projection-STEPS, or Projection-APS; do not place vehicle types in category. "
+    "When the user asks about past years, prefer category='Historical'. "
+    "Powertrain is the propulsion type (BEV, PHEV, FCEV). "
+    "When comparing multiple regions, include all of them using region IN ('China', 'USA', ...). "
+    "When the user asks for a time range or the last N years, filter with year >= <start> AND year <= <end>. "
+    "The latest year in category='Historical' is 2023, so 'last 5 years' means years 2019 through 2023. "
+    "When returning time series comparisons, select region and year and aggregate with SUM(value), then GROUP BY region, year and ORDER BY year, region. "
+    "For parameter='EV stock', if the user does not specify a powertrain, sum across powertrain values by not filtering powertrain. "
+    "Use region='USA' for the United States (not 'US' or 'United States'). "
+    "Return only the needed aggregates or columns."
 )
 
 

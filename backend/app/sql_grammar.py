@@ -6,13 +6,15 @@ from lark import Lark, UnexpectedInput
 _SQL_GRAMMAR = r"""
 start: select_stmt
 
-select_stmt: SELECT select_list FROM table_name where_clause? limit_clause?
+select_stmt: SELECT select_list FROM table_name where_clause? group_by_clause? order_by_clause? limit_clause?
 
-select_list: agg_expr
-           | column_list
+select_list: select_item ("," select_item)*
 
 agg_expr: agg_func "(" value_column ")" alias?
 alias: AS IDENTIFIER
+
+select_item: agg_expr
+           | column
 
 column_list: column ("," column)*
 
@@ -20,9 +22,25 @@ where_clause: WHERE condition
 
 condition: comparison (AND comparison)*
 
-comparison: column "=" literal
+comparison: column comparator literal
+          | column IN "(" literal_list ")"
+
+literal_list: literal ("," literal)*
+
+comparator: "="
+          | ">="
+          | "<="
+          | ">"
+          | "<"
 
 limit_clause: LIMIT INT
+
+group_by_clause: GROUP BY column_list
+
+order_by_clause: ORDER BY order_list
+order_list: order_item ("," order_item)*
+order_item: column order_dir?
+order_dir: ASC | DESC
 
 agg_func: SUM
         | COUNT
@@ -56,8 +74,14 @@ SINGLE_QUOTED: "'" /[^']*/ "'"
 SELECT: "SELECT"
 FROM: "FROM"
 WHERE: "WHERE"
+GROUP: "GROUP"
+BY: "BY"
+ORDER: "ORDER"
+ASC: "ASC"
+DESC: "DESC"
 LIMIT: "LIMIT"
 AS: "AS"
+IN: "IN"
 SUM: "SUM"
 COUNT: "COUNT"
 AVG: "AVG"

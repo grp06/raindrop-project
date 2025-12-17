@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from .clickhouse_client import clickhouse_ping, query_iea_sample
+from .clickhouse_client import clickhouse_ping, execute_sql
 from .sql_generation import ConfigurationError, generate_sql
 
 
@@ -34,15 +34,32 @@ def clickhouse_health():
 def query(request: QueryRequest):
     prompt = request.prompt.strip()
     if not prompt:
-        raise HTTPException(status_code=400, detail="prompt is required")
+        return JSONResponse(
+            status_code=400,
+            content={"sql": "", "columns": [], "rows": [], "error": "prompt is required"},
+        )
+    sql = ""
     try:
-        result = query_iea_sample()
-        return {k: v for k, v in result.items() if k != "error"}
-    except Exception as exc:
-        logger.exception("ClickHouse query failed")
+        sql = generate_sql(prompt)
+        result = execute_sql(sql)
+        return {"sql": sql, "columns": result["columns"], "rows": result["rows"]}
+    except ConfigurationError as exc:
+        logger.exception("SQL generation configuration error")
         return JSONResponse(
             status_code=500,
-            content={"sql": "", "rows": [], "error": str(exc)},
+            content={"sql": sql, "columns": [], "rows": [], "error": str(exc)},
+        )
+    except ValueError as exc:
+        logger.exception("SQL generation validation error")
+        return JSONResponse(
+            status_code=400,
+            content={"sql": sql, "columns": [], "rows": [], "error": str(exc)},
+        )
+    except Exception as exc:
+        logger.exception("Query generation or execution failed")
+        return JSONResponse(
+            status_code=502,
+            content={"sql": sql, "columns": [], "rows": [], "error": str(exc)},
         )
 
 
