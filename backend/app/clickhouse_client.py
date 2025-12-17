@@ -8,6 +8,8 @@ import clickhouse_connect
 from clickhouse_connect.driver.client import Client
 from dotenv import load_dotenv
 
+from .sql_grammar import validate_sql
+
 logger = logging.getLogger(__name__)
 
 ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
@@ -19,6 +21,8 @@ TABLE = "IEA_Global_EV_Data_2024"
 PORT = 8443
 SECURE = True
 PASSWORD_ENV = "CLICKHOUSE_PASSWORD"
+MAX_EXECUTION_TIME_SECONDS = 20
+MAX_RESULT_ROWS = 1000
 
 
 def _require_password() -> str:
@@ -75,3 +79,19 @@ def query_iea_sample(year: int = 2023, limit: int = 25) -> Dict[str, Any]:
     columns: List[str] = result.column_names
     rows = [dict(zip(columns, row)) for row in result.result_rows]
     return {"sql": sql, "columns": columns, "rows": rows}
+
+
+def execute_sql(sql: str) -> Dict[str, Any]:
+    validate_sql(sql)
+    client = get_client()
+    result = client.query(
+        sql,
+        settings={
+            "max_execution_time": MAX_EXECUTION_TIME_SECONDS,
+            "max_result_rows": MAX_RESULT_ROWS,
+            "result_overflow_mode": "throw",
+        },
+    )
+    columns: List[str] = result.column_names
+    rows = [dict(zip(columns, row)) for row in result.result_rows]
+    return {"columns": columns, "rows": rows}

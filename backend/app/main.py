@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from .clickhouse_client import clickhouse_ping, query_iea_sample
+from .sql_generation import ConfigurationError, generate_sql
 
 
 class QueryRequest(BaseModel):
@@ -43,3 +44,22 @@ def query(request: QueryRequest):
             status_code=500,
             content={"sql": "", "rows": [], "error": str(exc)},
         )
+
+
+@app.post("/api/sql/generate")
+def sql_generate(request: QueryRequest):
+    prompt = request.prompt.strip()
+    if not prompt:
+        raise HTTPException(status_code=400, detail="prompt is required")
+    try:
+        sql = generate_sql(prompt)
+        return {"sql": sql}
+    except ConfigurationError as exc:
+        logger.exception("SQL generation configuration error")
+        raise HTTPException(status_code=500, detail=str(exc))
+    except ValueError as exc:
+        logger.exception("SQL generation validation error")
+        raise HTTPException(status_code=502, detail=str(exc))
+    except Exception as exc:
+        logger.exception("SQL generation failed")
+        raise HTTPException(status_code=502, detail=str(exc))
