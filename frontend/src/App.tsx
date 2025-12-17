@@ -51,7 +51,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-muted/40 via-background to-background">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10">
         <header className="rounded-2xl border bg-card/80 p-6 shadow-sm backdrop-blur">
           <div className="space-y-2">
             <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-tight bg-primary/10 text-primary">
@@ -60,7 +60,7 @@ function App() {
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">
               Ask anything about 13,000+ athletes
             </h1>
-            <p className="max-w-2xl text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Ask questions in plain English. We'll query a real dataset of physical performance metrics and show you the results.
             </p>
           </div>

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Code2, Zap } from "lucide-react"
+import { Code2, MessageSquareText, Sparkles, Zap } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -20,7 +20,7 @@ function ResultsCard({ result }: ResultsCardProps) {
 
   const description = hasSuccess
     ? `${rows.length} ${rows.length === 1 ? "result" : "results"} found`
-    : "Your answer will appear here"
+    : null
 
   return (
     <Card className="shadow-sm">
@@ -30,19 +30,22 @@ function ResultsCard({ result }: ResultsCardProps) {
             <Zap className="h-5 w-5 text-primary" />
             Results
           </CardTitle>
-          <CardDescription>{description}</CardDescription>
+          {description && <CardDescription>{description}</CardDescription>}
         </div>
-        {hasSuccess && <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10">Success</Badge>}
         {hasError && <Badge variant="destructive">Error</Badge>}
       </CardHeader>
       <CardContent className="space-y-4">
         {!result && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="rounded-full bg-muted p-3 mb-3">
-              <Zap className="h-6 w-6 text-primary/50" />
+            <div className="relative mb-4">
+              <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 p-4">
+                <MessageSquareText className="h-8 w-8 text-primary" />
+              </div>
+              <div className="absolute -top-1 -right-1 rounded-full bg-primary/20 p-1.5">
+                <Sparkles className="h-3 w-3 text-primary" />
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground">Ask a question to see results</p>
-            <p className="text-xs text-muted-foreground/60 mt-1">Powered by GPT-5 + Context Free Grammar</p>
+            <p className="text-sm text-muted-foreground">Your results will appear here</p>
           </div>
         )}
 
