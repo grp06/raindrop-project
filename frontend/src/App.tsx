@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Textarea } from '@/components/ui/textarea'
-import { ChevronDown, ChevronRight, ChevronUp, Code2, Loader2, Sparkles, Zap } from 'lucide-react'
+import { ChevronDown, ChevronRight, ChevronUp, Code2, Info, Loader2, Sparkles, Zap } from 'lucide-react'
 
 type QueryResponse = {
   sql: string
@@ -39,10 +39,17 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [showSql, setShowSql] = useState(false)
   const [showMoreExamples, setShowMoreExamples] = useState(false)
+  const [showFields, setShowFields] = useState(false)
 
-  const submitPrompt = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const trimmed = prompt.trim()
+  const fieldGroups = [
+    { label: 'Demographics', fields: 'age, gender, height, weight' },
+    { label: 'Health', fields: 'body fat %, systolic, diastolic' },
+    { label: 'Performance', fields: 'grip force, sit-ups, broad jump, flexibility' },
+    { label: 'Classification', fields: 'fitness class (A–D)' },
+  ]
+
+  const runQuery = async (queryPrompt: string) => {
+    const trimmed = queryPrompt.trim()
     if (!trimmed) {
       setError('Enter a prompt to send to the backend.')
       return
@@ -90,9 +97,19 @@ function App() {
     }
   }
 
+  const submitPrompt = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    runQuery(prompt)
+  }
+
+  const handleExampleClick = (example: string) => {
+    setPrompt(example)
+    runQuery(example)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-muted/40 via-background to-background">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10">
         <header className="rounded-2xl border bg-card/80 p-6 shadow-sm backdrop-blur">
           <div className="space-y-2">
             <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-tight">
@@ -135,8 +152,9 @@ function App() {
                         <button
                           key={example}
                           type="button"
-                          className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left"
-                          onClick={() => setPrompt(example)}
+                          className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left disabled:opacity-50"
+                          onClick={() => handleExampleClick(example)}
+                          disabled={loading}
                         >
                           {example}
                         </button>
@@ -145,30 +163,51 @@ function App() {
                         <button
                           key={example}
                           type="button"
-                          className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left"
-                          onClick={() => setPrompt(example)}
+                          className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left disabled:opacity-50"
+                          onClick={() => handleExampleClick(example)}
+                          disabled={loading}
                         >
                           {example}
                         </button>
                       ))}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowMoreExamples(!showMoreExamples)}
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-                    >
-                      {showMoreExamples ? (
-                        <>
-                          <ChevronUp className="h-3 w-3" />
-                          Show fewer examples
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="h-3 w-3" />
-                          Show more examples
-                        </>
-                      )}
-                    </button>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      <button
+                        type="button"
+                        onClick={() => setShowMoreExamples(!showMoreExamples)}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                      >
+                        {showMoreExamples ? (
+                          <>
+                            <ChevronUp className="h-3 w-3" />
+                            Show fewer examples
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="h-3 w-3" />
+                            Show more examples
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowFields(!showFields)}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                      >
+                        <Info className="h-3 w-3" />
+                        {showFields ? 'Hide' : 'View'} available fields
+                      </button>
+                    </div>
+                    {showFields && (
+                      <div className="rounded-lg border bg-muted/50 p-3 text-xs space-y-1.5">
+                        {fieldGroups.map((group) => (
+                          <div key={group.label} className="flex gap-2">
+                            <span className="font-medium text-foreground w-24 shrink-0">{group.label}:</span>
+                            <span className="text-muted-foreground">{group.fields}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
@@ -305,6 +344,15 @@ function App() {
 
         <footer className="text-center text-xs text-muted-foreground/60 pt-4">
           Dataset: 13,393 physical performance records from the Korea Sports Promotion Foundation. Ages 20–64, classified A–D by fitness level.
+          {' '}
+          <a 
+            href="https://www.opendatabay.com/data/healthcare/950616d0-e08a-4ab3-9e13-84c010e9d4b8" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="underline hover:text-muted-foreground transition-colors"
+          >
+            View source dataset
+          </a>
         </footer>
       </div>
     </div>
