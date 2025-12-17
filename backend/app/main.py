@@ -34,6 +34,19 @@ app.add_middleware(
 logger = logging.getLogger(__name__)
 
 
+def _error_response(
+    status_code: int,
+    message: str,
+    sql: str = "",
+    include_rows: bool = True,
+) -> JSONResponse:
+    content = {"sql": sql, "error": message}
+    if include_rows:
+        content["columns"] = []
+        content["rows"] = []
+    return JSONResponse(status_code=status_code, content=content)
+
+
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
@@ -52,10 +65,7 @@ def clickhouse_health():
 def query(request: QueryRequest):
     prompt = request.prompt.strip()
     if not prompt:
-        return JSONResponse(
-            status_code=400,
-            content={"sql": "", "columns": [], "rows": [], "error": "prompt is required"},
-        )
+        return _error_response(400, "prompt is required")
     sql = ""
     try:
         # End-to-end path: NL prompt -> CFG-constrained SQL -> ClickHouse execution.
@@ -64,39 +74,31 @@ def query(request: QueryRequest):
         return {"sql": sql, "columns": result["columns"], "rows": result["rows"]}
     except ConfigurationError as exc:
         logger.exception("SQL generation configuration error")
-        return JSONResponse(
-            status_code=500,
-            content={"sql": sql, "columns": [], "rows": [], "error": str(exc)},
-        )
+        return _error_response(500, str(exc), sql=sql)
     except ValueError as exc:
         logger.exception("SQL generation validation error")
-        return JSONResponse(
-            status_code=400,
-            content={"sql": sql, "columns": [], "rows": [], "error": str(exc)},
-        )
+        return _error_response(400, str(exc), sql=sql)
     except Exception as exc:
         logger.exception("Query generation or execution failed")
-        return JSONResponse(
-            status_code=502,
-            content={"sql": sql, "columns": [], "rows": [], "error": str(exc)},
-        )
+        return _error_response(502, str(exc), sql=sql)
 
 
 @app.post("/api/sql/generate")
 def sql_generate(request: QueryRequest):
     prompt = request.prompt.strip()
     if not prompt:
-        raise HTTPException(status_code=400, detail="prompt is required")
+        return _error_response(400, "prompt is required", include_rows=False)
+    sql = ""
     try:
         # Generation-only endpoint for debugging/evals (no ClickHouse execution).
         sql = generate_sql(prompt)
         return {"sql": sql}
     except ConfigurationError as exc:
         logger.exception("SQL generation configuration error")
-        raise HTTPException(status_code=500, detail=str(exc))
+        return _error_response(500, str(exc), sql=sql, include_rows=False)
     except ValueError as exc:
         logger.exception("SQL generation validation error")
-        raise HTTPException(status_code=502, detail=str(exc))
+        return _error_response(400, str(exc), sql=sql, include_rows=False)
     except Exception as exc:
         logger.exception("SQL generation failed")
-        raise HTTPException(status_code=502, detail=str(exc))
+        return _error_response(502, str(exc), sql=sql, include_rows=False)

@@ -1,17 +1,14 @@
 import logging
-import os
 from functools import lru_cache
-from pathlib import Path
 
-from dotenv import load_dotenv
 from openai import OpenAI
 
+from .config import get_env, require_env
 from .schema import COLUMNS, DATASET
 from .sql_grammar import sql_grammar, validate_sql
 
 logger = logging.getLogger(__name__)
 
-ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 API_KEY_ENV = "OPENAI_API_KEY"
 MODEL_ENV = "OPENAI_MODEL"
 DEFAULT_MODEL = "gpt-5.2"
@@ -36,11 +33,12 @@ class ConfigurationError(Exception):
 
 @lru_cache(maxsize=1)
 def _settings() -> tuple[str, str]:
-    load_dotenv(ENV_PATH)
-    api_key = os.getenv(API_KEY_ENV)
-    if not api_key:
-        raise ConfigurationError(f"{API_KEY_ENV} is required. Set it in backend/.env.")
-    model = os.getenv(MODEL_ENV, DEFAULT_MODEL)
+    api_key = require_env(
+        API_KEY_ENV,
+        f"{API_KEY_ENV} is required. Set it in backend/.env.",
+        ConfigurationError,
+    )
+    model = get_env(MODEL_ENV, DEFAULT_MODEL)
     return api_key, model
 
 

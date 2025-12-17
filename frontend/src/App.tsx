@@ -96,7 +96,7 @@ function App() {
             loading={loading}
             error={error}
           />
-          <ResultsCard result={result} />
+          <ResultsCard result={result} loading={loading} />
         </div>
 
         <footer className="text-center text-xs text-muted-foreground/60 pt-4">

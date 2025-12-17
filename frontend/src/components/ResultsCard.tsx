@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Code2, MessageSquareText, Sparkles, Zap } from "lucide-react"
+import { Code2, Loader2, MessageSquareText, Sparkles, Zap } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -8,9 +8,10 @@ import type { QueryResponse } from "@/types/query"
 
 type ResultsCardProps = {
   result: QueryResponse | null
+  loading?: boolean
 }
 
-function ResultsCard({ result }: ResultsCardProps) {
+function ResultsCard({ result, loading }: ResultsCardProps) {
   const [showSql, setShowSql] = useState(false)
 
   const rows = result ? result.rows : []
@@ -37,15 +38,26 @@ function ResultsCard({ result }: ResultsCardProps) {
       <CardContent className="space-y-4">
         {!result && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="relative mb-4">
-              <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 p-4">
-                <MessageSquareText className="h-8 w-8 text-primary" />
-              </div>
-              <div className="absolute -top-1 -right-1 rounded-full bg-primary/20 p-1.5">
-                <Sparkles className="h-3 w-3 text-primary" />
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">Your results will appear here</p>
+            {loading ? (
+              <>
+                <div className="mb-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 p-4">
+                  <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                </div>
+                <p className="text-sm text-muted-foreground">Analyzing your question...</p>
+              </>
+            ) : (
+              <>
+                <div className="relative mb-4">
+                  <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 p-4">
+                    <MessageSquareText className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 rounded-full bg-primary/20 p-1.5">
+                    <Sparkles className="h-3 w-3 text-primary" />
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">Your results will appear here</p>
+              </>
+            )}
           </div>
         )}
 

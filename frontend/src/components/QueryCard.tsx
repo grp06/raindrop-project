@@ -102,7 +102,7 @@ function QueryCard({
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
             <div className="flex flex-col gap-1 text-sm">{error && <span className="text-destructive">{error}</span>}</div>
-            <Button type="submit" disabled={loading} size="lg" className="gap-2">
+            <Button type="submit" disabled={loading || !prompt.trim()} size="lg" className="gap-2">
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />

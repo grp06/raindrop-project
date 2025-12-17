@@ -1,19 +1,15 @@
 import logging
-import os
 from functools import lru_cache
-from pathlib import Path
 from typing import Any, Dict, List
 
 import clickhouse_connect
 from clickhouse_connect.driver.client import Client
-from dotenv import load_dotenv
 
-from .schema import COLUMNS, DATABASE, TABLE
+from .config import require_env
+from .schema import DATABASE, TABLE
 from .sql_grammar import validate_sql
 
 logger = logging.getLogger(__name__)
-
-ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 
 HOST = "zdni402lap.us-east1.gcp.clickhouse.cloud"
 USER = "default"
@@ -22,15 +18,13 @@ SECURE = True
 PASSWORD_ENV = "CLICKHOUSE_PASSWORD"
 MAX_EXECUTION_TIME_SECONDS = 20
 MAX_RESULT_ROWS = 1000
-SELECT_COLUMNS = ", ".join(COLUMNS)
 
 
 def _require_password() -> str:
-    load_dotenv(ENV_PATH)
-    value = os.getenv(PASSWORD_ENV)
-    if value is None or value == "":
-        raise ValueError(f"{PASSWORD_ENV} is required. Set it in backend/.env.")
-    return value
+    return require_env(
+        PASSWORD_ENV,
+        f"{PASSWORD_ENV} is required. Set it in backend/.env.",
+    )
 
 
 @lru_cache(maxsize=1)
@@ -63,17 +57,6 @@ def clickhouse_ping() -> Dict[str, Any]:
         "select_1": select_one,
         "row_count": row_count,
     }
-
-
-def query_body_performance_sample(limit: int = 25) -> Dict[str, Any]:
-    if limit <= 0:
-        raise ValueError("limit must be positive")
-    client = get_client()
-    sql = f"SELECT {SELECT_COLUMNS} FROM {DATABASE}.{TABLE} LIMIT {limit}"
-    result = client.query(sql)
-    columns: List[str] = result.column_names
-    rows = [dict(zip(columns, row)) for row in result.result_rows]
-    return {"sql": sql, "columns": columns, "rows": rows}
 
 
 def execute_sql(sql: str) -> Dict[str, Any]:
