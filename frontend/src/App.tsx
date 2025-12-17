@@ -54,7 +54,7 @@ function App() {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10">
         <header className="rounded-2xl border bg-card/80 p-6 shadow-sm backdrop-blur">
           <div className="space-y-2">
-            <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-tight">
+            <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-tight bg-primary/10 text-primary">
               Fitness Data Explorer
             </Badge>
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">

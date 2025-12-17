@@ -31,7 +31,7 @@ function QueryCard({
     <Card className="shadow-sm">
       <CardHeader className="space-y-2">
         <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-amber-500" />
+          <Sparkles className="h-5 w-5 text-primary" />
           Your question
         </CardTitle>
         <CardDescription>Describe what you want to know in plain English.</CardDescription>

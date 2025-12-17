@@ -27,7 +27,7 @@ function ResultsCard({ result }: ResultsCardProps) {
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-blue-500" />
+            <Zap className="h-5 w-5 text-primary" />
             Results
           </CardTitle>
           <CardDescription>{description}</CardDescription>
@@ -39,7 +39,7 @@ function ResultsCard({ result }: ResultsCardProps) {
         {!result && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="rounded-full bg-muted p-3 mb-3">
-              <Zap className="h-6 w-6 text-muted-foreground" />
+              <Zap className="h-6 w-6 text-primary/50" />
             </div>
             <p className="text-sm text-muted-foreground">Ask a question to see results</p>
             <p className="text-xs text-muted-foreground/60 mt-1">Powered by GPT-5 + Context Free Grammar</p>
