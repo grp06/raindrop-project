@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ChevronDown, ChevronRight, ChevronUp, Loader2, Sparkles } from "lucide-react"
+import { ChevronDown, ChevronRight, ChevronUp, Loader2, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -29,7 +29,7 @@ function QueryCard({
     <Card className="shadow-sm">
       <CardHeader className="space-y-2">
         <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
+          <Search className="h-5 w-5 text-primary" />
           Your question
         </CardTitle>
         <CardDescription>Describe what you want to know in plain English.</CardDescription>
