@@ -40,6 +40,7 @@ def query(request: QueryRequest):
         )
     sql = ""
     try:
+        # End-to-end path: NL prompt -> CFG-constrained SQL -> ClickHouse execution.
         sql = generate_sql(prompt)
         result = execute_sql(sql)
         return {"sql": sql, "columns": result["columns"], "rows": result["rows"]}
@@ -69,6 +70,7 @@ def sql_generate(request: QueryRequest):
     if not prompt:
         raise HTTPException(status_code=400, detail="prompt is required")
     try:
+        # Generation-only endpoint for debugging/evals (no ClickHouse execution).
         sql = generate_sql(prompt)
         return {"sql": sql}
     except ConfigurationError as exc:

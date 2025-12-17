@@ -1,3 +1,4 @@
+# Single source of truth for the ClickHouse dataset + allowlisted columns (used by prompt, CFG, and query execution).
 DATABASE = "default"
 TABLE = "bodyPerformance"
 DATASET = f"{DATABASE}.{TABLE}"

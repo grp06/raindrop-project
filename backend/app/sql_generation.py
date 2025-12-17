@@ -56,6 +56,7 @@ def _model_name() -> str:
 
 
 def _custom_tool() -> dict:
+    # The tool's plaintext input is CFG-constrained to our SQL grammar.
     return {
         "type": "custom",
         "name": TOOL_NAME,
@@ -69,6 +70,7 @@ def _custom_tool() -> dict:
 
 
 def _extract_sql(response) -> str:
+    # Only accept the constrained tool call input; do not fall back to free-form text.
     for item in response.output:
         if getattr(item, "type", None) == "custom_tool_call" and getattr(item, "name", "") == TOOL_NAME:
             return item.input
@@ -87,6 +89,7 @@ def generate_sql(prompt: str) -> str:
             input=text,
             instructions=SYSTEM_INSTRUCTIONS,
             tools=[_custom_tool()],
+            # Force a tool call so we always get CFG-constrained SQL back.
             tool_choice={"type": "custom", "name": TOOL_NAME},
             temperature=0,
             max_output_tokens=256,

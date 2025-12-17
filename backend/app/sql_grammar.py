@@ -5,6 +5,7 @@ from lark import Lark, UnexpectedInput
 from .schema import COLUMNS, DATABASE, NUMERIC_COLUMNS, TABLE
 
 
+# Grammar is generated from schema constants to keep the model constraint and server-side validation in sync.
 def _token(name: str) -> str:
     return name.upper()
 

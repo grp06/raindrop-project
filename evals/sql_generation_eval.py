@@ -9,6 +9,7 @@ from urllib import error, parse, request
 
 logger = logging.getLogger("evals")
 
+# Property-based generation evals: hit /api/sql/generate and assert the SQL reflects the intent of the prompt.
 
 @dataclass(frozen=True)
 class TestCase:

@@ -6,6 +6,7 @@ from urllib import error, parse, request
 
 logger = logging.getLogger("evals")
 
+# Lightweight execution smoke: hit /api/query and fail if generation/execution returns an error.
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()

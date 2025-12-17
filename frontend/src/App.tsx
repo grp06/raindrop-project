@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Textarea } from '@/components/ui/textarea'
-import { Database, Loader2, Send, Server } from 'lucide-react'
+import { ChevronDown, ChevronRight, ChevronUp, Code2, Loader2, Sparkles, Zap } from 'lucide-react'
 
 type QueryResponse = {
   sql: string
@@ -14,41 +14,31 @@ type QueryResponse = {
   error?: string
 }
 
+const primaryExamples = [
+  'Average grip force by fitness class',
+  'Compare body fat percentage between males and females',
+  'How many participants are in each fitness class?',
+  'Top 10 strongest grip force results',
+  'Average blood pressure by age group',
+]
+
+const moreExamples = [
+  'What is the average weight for class A athletes?',
+  'Compare sit-up counts between genders',
+  'Broad jump distance by fitness class',
+  'Average height and weight for females over 40',
+  'How many participants have body fat under 20%?',
+  'Systolic vs diastolic blood pressure averages',
+  'Top 5 sit-up performers in class A',
+]
+
 function App() {
   const [prompt, setPrompt] = useState('')
   const [result, setResult] = useState<QueryResponse | null>(null)
-  const [healthStatus, setHealthStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const examplePrompts = [
-    'Average grip force by fitness class',
-    'Compare average body fat percentage between genders.',
-    'How many participants are in each fitness class?',
-    'Average sit-ups count by age and gender.',
-    'Top 5 broad jump results for females.',
-    'Average systolic and diastolic blood pressure by fitness class.',
-    'Compare average weight between fitness class A and D.',
-    'Average grip force for age 40 and above by gender.',
-    'How many participants are 20 to 29 years old?',
-  ]
-
-  const fetchHealth = async () => {
-    setError(null)
-    setHealthStatus(null)
-
-    try {
-      const response = await fetch('/api/health')
-      if (!response.ok) {
-        throw new Error(`Health check failed with status ${response.status}`)
-      }
-
-      const data = (await response.json()) as { status?: string }
-      setHealthStatus(data.status ?? 'unknown')
-    } catch (err) {
-      console.error(err)
-      setError('Unable to reach the backend. Is it running?')
-    }
-  }
+  const [showSql, setShowSql] = useState(false)
+  const [showMoreExamples, setShowMoreExamples] = useState(false)
 
   const submitPrompt = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -103,80 +93,98 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-muted/40 via-background to-background">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10">
-        <header className="flex flex-col gap-6 rounded-2xl border bg-card/80 p-6 shadow-sm backdrop-blur md:flex-row md:items-center md:justify-between">
+        <header className="rounded-2xl border bg-card/80 p-6 shadow-sm backdrop-blur">
           <div className="space-y-2">
             <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-tight">
-              Body performance explorer
+              Fitness Data Explorer
             </Badge>
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-              Ask questions about physical performance
+              Ask anything about 13,000+ athletes
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground">
-              Turn natural-language questions into SQL to explore fitness, strength, and health metrics.
+              Ask questions in plain English. We'll query a real dataset of physical performance metrics and show you the results.
             </p>
           </div>
-          <Button variant="outline" size="lg" onClick={fetchHealth} disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Checking...
-              </>
-            ) : (
-              <>
-                <Server className="mr-2 h-4 w-4" />
-                Check backend
-              </>
-            )}
-          </Button>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2 items-start">
           <Card className="shadow-sm">
             <CardHeader className="space-y-2">
-              <CardTitle>Ask about the body performance dataset</CardTitle>
-              <CardDescription>Describe what you want to know; we will generate SQL for you.</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-amber-500" />
+                Your question
+              </CardTitle>
+              <CardDescription>Describe what you want to know in plain English.</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-4" onSubmit={submitPrompt}>
-                <div className="space-y-2">
-                  <Label htmlFor="prompt">Prompt</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="prompt" className="sr-only">Prompt</Label>
                     <Textarea
                       id="prompt"
                       value={prompt}
                       onChange={(event) => setPrompt(event.target.value)}
-                    placeholder="Average grip force by fitness class, or compare average body fat percentage between genders."
-                      rows={5}
+                    placeholder="e.g., What's the average grip strength by fitness class?"
+                      rows={4}
+                      className="text-base"
                     />
-                  <div className="flex flex-wrap gap-2">
-                    {examplePrompts.map((example) => (
-                      <Button
-                        key={example}
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="rounded-full"
-                        onClick={() => setPrompt(example)}
-                      >
-                        {example}
-                      </Button>
-                    ))}
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground font-medium">Try an example:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {primaryExamples.map((example) => (
+                        <button
+                          key={example}
+                          type="button"
+                          className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left"
+                          onClick={() => setPrompt(example)}
+                        >
+                          {example}
+                        </button>
+                      ))}
+                      {showMoreExamples && moreExamples.map((example) => (
+                        <button
+                          key={example}
+                          type="button"
+                          className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors text-left"
+                          onClick={() => setPrompt(example)}
+                        >
+                          {example}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreExamples(!showMoreExamples)}
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                    >
+                      {showMoreExamples ? (
+                        <>
+                          <ChevronUp className="h-3 w-3" />
+                          Show fewer examples
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-3 w-3" />
+                          Show more examples
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                   <div className="flex flex-col gap-1 text-sm">
                     {error && <span className="text-destructive">{error}</span>}
-                    {healthStatus && <span className="text-emerald-600">Backend status: {healthStatus}</span>}
                   </div>
-                  <Button type="submit" disabled={loading} size="lg">
+                  <Button type="submit" disabled={loading} size="lg" className="gap-2">
                     {loading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Sending
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Analyzing...
                       </>
                     ) : (
                       <>
-                        <Send className="mr-2 h-4 w-4" />
-                        Send to backend
+                        Get answer
+                        <ChevronRight className="h-4 w-4" />
                       </>
                     )}
                   </Button>
@@ -189,79 +197,101 @@ function App() {
             <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Database className="h-5 w-5 text-primary" />
-                  Query result
+                  <Zap className="h-5 w-5 text-blue-500" />
+                  Results
                 </CardTitle>
-                <CardDescription>SQL generated from your prompt and the returned rows.</CardDescription>
+                <CardDescription>
+                  {result && !result.error && Array.isArray(result.rows) 
+                    ? `${result.rows.length} ${result.rows.length === 1 ? 'result' : 'results'} found`
+                    : 'Your answer will appear here'}
+                </CardDescription>
               </div>
-              {result && !result.error && <Badge variant="secondary">OK</Badge>}
+              {result && !result.error && <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10">Success</Badge>}
               {result?.error && <Badge variant="destructive">Error</Badge>}
             </CardHeader>
             <CardContent className="space-y-4">
-              {!result && <p className="text-sm text-muted-foreground">Submit a prompt to see SQL and rows.</p>}
+              {!result && (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="rounded-full bg-muted p-3 mb-3">
+                    <Zap className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Ask a question to see results</p>
+                  <p className="text-xs text-muted-foreground/60 mt-1">Powered by GPT-5 + Context Free Grammar</p>
+                </div>
+              )}
 
               {result && (
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">SQL</p>
-                    <ScrollArea className="h-32 rounded-lg border bg-muted/40 px-3 py-2">
-                      <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                        {result.sql || '—'}
-                      </pre>
-                    </ScrollArea>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Rows</p>
-                    <ScrollArea className="h-60 rounded-lg border bg-muted/40 px-3 py-2">
-                      {Array.isArray(result.rows) && result.rows.length > 0 && result.rows.every((row) => row && typeof row === 'object' && !Array.isArray(row)) ? (
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="text-left text-muted-foreground">
-                              {(result.columns && result.columns.length > 0
+                  <div className="max-h-72 overflow-auto rounded-lg border bg-muted/40 px-3 py-2">
+                    {Array.isArray(result.rows) && result.rows.length > 0 && result.rows.every((row) => row && typeof row === 'object' && !Array.isArray(row)) ? (
+                      <table className="w-full text-sm">
+                        <thead className="sticky -top-2 -mx-3 px-3 bg-muted">
+                          <tr className="text-left text-muted-foreground">
+                            {(result.columns && result.columns.length > 0
+                              ? result.columns
+                              : Array.from(
+                                  new Set(
+                                    (result.rows as Record<string, unknown>[]).flatMap((row) => Object.keys(row)),
+                                  ),
+                                )
+                            ).map((column) => (
+                              <th key={column} className="border-b py-2 pr-4 font-medium">
+                                {column}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(result.rows as Record<string, unknown>[]).map((row, index) => {
+                            const columns =
+                              result.columns && result.columns.length > 0
                                 ? result.columns
-                                : Array.from(
-                                    new Set(
-                                      (result.rows as Record<string, unknown>[]).flatMap((row) => Object.keys(row)),
-                                    ),
-                                  )
-                              ).map((column) => (
-                                <th key={column} className="border-b py-2 pr-4 font-medium">
-                                  {column}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {(result.rows as Record<string, unknown>[]).map((row, index) => {
-                              const columns =
-                                result.columns && result.columns.length > 0
-                                  ? result.columns
-                                  : Object.keys(row)
-                              return (
-                                <tr key={index} className="border-b last:border-0">
-                                  {columns.map((column) => (
-                                    <td key={column} className="py-2 pr-4">
-                                      {String(row[column] ?? '')}
-                                    </td>
-                                  ))}
-                                </tr>
-                              )
-                            })}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
-                          {Array.isArray(result.rows) ? JSON.stringify(result.rows, null, 2) : '—'}
-                        </pre>
-                      )}
-                      {Array.isArray(result.rows) && result.rows.length === 0 && (
-                        <p className="text-sm text-muted-foreground">No rows returned.</p>
-                      )}
-                    </ScrollArea>
+                                : Object.keys(row)
+                            return (
+                              <tr key={index} className="border-b last:border-0">
+                                {columns.map((column) => (
+                                  <td key={column} className="py-2 pr-4">
+                                    {String(row[column] ?? '')}
+                                  </td>
+                                ))}
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
+                        {Array.isArray(result.rows) ? JSON.stringify(result.rows, null, 2) : '—'}
+                      </pre>
+                    )}
+                    {Array.isArray(result.rows) && result.rows.length === 0 && (
+                      <p className="text-sm text-muted-foreground py-4 text-center">No matching results found.</p>
+                    )}
                   </div>
+                  
+                  {result.sql && (
+                    <div className="space-y-2">
+                      <button 
+                        type="button"
+                        onClick={() => setShowSql(!showSql)}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                      >
+                        <Code2 className="h-3 w-3" />
+                        {showSql ? 'Hide' : 'Show'} generated SQL
+                      </button>
+                      {showSql && (
+                        <ScrollArea className="h-24 rounded-lg border bg-muted/40 px-3 py-2">
+                          <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-muted-foreground">
+                            {result.sql}
+                          </pre>
+                        </ScrollArea>
+                      )}
+                    </div>
+                  )}
+
                   {result.error && (
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Error</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-destructive">Error</p>
                       <ScrollArea className="rounded-lg border bg-destructive/10 px-3 py-2 text-destructive">
                         <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">{result.error}</pre>
                       </ScrollArea>
@@ -272,6 +302,10 @@ function App() {
             </CardContent>
           </Card>
         </div>
+
+        <footer className="text-center text-xs text-muted-foreground/60 pt-4">
+          Dataset: 13,393 physical performance records from the Korea Sports Promotion Foundation. Ages 20–64, classified A–D by fitness level.
+        </footer>
       </div>
     </div>
   )
